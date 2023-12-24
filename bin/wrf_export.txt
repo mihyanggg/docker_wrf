@@ -1,0 +1,20 @@
+export HOME=/home/myuser
+#export HOME=/root
+
+export DIR=$HOME/WRF/Library
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+export F77=gfortran
+
+export HDF5=$DIR
+
+export PATH=$DIR/bin:$PATH
+export NETCDF=$DIR
+
+export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz"
+
+export JASPERLIB=$DIR/lib
+export JASPERINC=$DIR/include
+
+export WRF_DIR=$HOME/WRF/WRF-4.1.2

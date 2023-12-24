@@ -1,0 +1,37 @@
+# export for WRF library
+
+echo "root password is 123"
+
+export HOME=/home/myuser
+#export HOME=/root
+
+export DIR=$HOME/WRF/Library
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+export F77=gfortran
+
+export HDF5=$DIR
+
+export PATH=$DIR/bin:$PATH
+export NETCDF=$DIR
+
+export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz"
+
+export JASPERLIB=$DIR/lib
+export JASPERINC=$DIR/include
+
+export LD_LIBRARY_PATH=$DIR/lib:$LD_LIBRARY_PATH
+
+export WRF_DIR=$HOME/WRF/WRF-4.1.2
+
+# mimi
+alias c='clear'
+alias e='exit'
+alias src_brc='source ~/.bashrc'
+
+# wrf
+alias wps='cd /home/myuser/WRF/WPS-4.1'
+alias wrf='cd /home/myuser/WRF/WRF-4.1.2'
+
+
