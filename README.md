@@ -12,8 +12,8 @@ installed WRF librady, WRF, WPS
 success : guide test
 install : ncview
 
-### 1.2_seoul
-success; 
-seoul and LDAPS (231201-231203 .. 72files)
-
+## 1.3 - 1.0(docker hub)
+install : python3, python3-pip, python-dev
+WRF,WPS download using git clone
+included the installation of the libraries used by WRF
 
