@@ -1,7 +1,5 @@
 #!/bin/bash
 
-touch $HOME/.run_start
-
 sudo apt update && sudo apt upgrade -y
 
 export DIR=$HOME/WRF/Library
@@ -68,5 +66,5 @@ echo "----- zlib install : START -----" \
 && export JASPERLIB=$DIR/lib \
 && export JASPERINC=$DIR/include \
 && echo "----- jasper install : END -----" \
-&& touch $HOME/.run_success
+&& touch $HOME/.wrf_library_installed
 

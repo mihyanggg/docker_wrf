@@ -11,7 +11,7 @@ docker run --privileged -d \
 -e DISPLAY=$DISPLAY \
 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 -v /home/mimi/wk/container_cores:/tmp/cores:rw \
-wrf-ucm:1.3
+mimil/wrf:1.1
 
 # --ulimit core=-1 # Allow Coredump Creation
 #--network host \

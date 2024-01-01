@@ -1,7 +1,6 @@
-# 기본 이미지로 Ubuntu를 사용
 FROM ubuntu:22.04
 
-# 필요한 패키지 설치, 여기서는 sudo를 설치합니다
+# Install the packages required by WRF and the ones I will use
 RUN apt-get update && apt-get install -y \
     sudo \
     iputils-ping \
@@ -28,48 +27,56 @@ RUN apt-get update && apt-get install -y \
     libhdf5-dev \
     zlib1g-dev \
     libgrib2c-dev \
+    ncview \
     python3 \
     python3-dev \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# 컨테이너의 호스트 이름 추가
-#RUN echo "127.0.0.1 test" >> /etc/hosts
-
-# root 비밀번호 설정
+# Set the 'root' password
 RUN echo 'root:123' | chpasswd
 
-# 새 사용자 생성
+# Create a user to use inside the container
 RUN useradd -m myuser
 
-# 새 사용자에게 sudo 권한 부여 및 비밀번호 없이 sudo 실행 가능하게 설정
+# Give the new user 'sudo' privileges, and enable them to run 'sudo' without a password
 RUN echo 'myuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# 컨테이너 실행 시 사용할 기본 사용자 변경
+# Change the default user to use in the container
 USER myuser
 ENV HOME /home/myuser
 
-# 기본 작업 디렉토리 설정
+# Set the default working directory
 WORKDIR /home/myuser
 
 RUN mkdir WRF
-RUN mkdir WRF/WPS_GEOG
 RUN mkdir WRF/DATA
 RUN mkdir WRF/Downloads
 RUN mkdir WRF/Library
 
 # COPY
-COPY ./bin/_bash_aliases /home/myuser/.bash_aliases
 COPY ./bin /home/myuser/bin/
-COPY ./downloads /home/myuser/WRF/Downloads
 
-# prompt change color and permission
+COPY ./downloads/geog_high_res_mandatory.tar.gz   /home/myuser/WRF/Downloads/geog_high_res_mandatory.tar.gz
+COPY ./downloads/hdf5-1.10.5.tar.gz               /home/myuser/WRF/Downloads/hdf5-1.10.5.tar.gz
+COPY ./downloads/jasper-1.900.1.zip               /home/myuser/WRF/Downloads/jasper-1.900.1.zip
+COPY ./downloads/libpng-1.6.37.tar.gz             /home/myuser/WRF/Downloads/libpng-1.6.37.tar.gz
+COPY ./downloads/mpich-3.3.1.tar.gz               /home/myuser/WRF/Downloads/mpich-3.3.1.tar.gz
+COPY ./downloads/netcdf-c-4.9.0.tar.gz            /home/myuser/WRF/Downloads/netcdf-c-4.9.0.tar.gz
+COPY ./downloads/netcdf-fortran-4.6.0.tar.gz      /home/myuser/WRF/Downloads/netcdf-fortran-4.6.0.tar.gz
+COPY ./downloads/zlib-1.3.tar.gz                  /home/myuser/WRF/Downloads/zlib-1.3.tar.gz
+
+# Changing prompt colors and permissions
 RUN /home/myuser/bin/color_prompt_and_bin_perm.sh
+RUN mv ./bin/_bash_aliases /home/myuser/.bash_aliases 
 
 # after v4.4 .. Please refer to [https://www2.mmm.ucar.edu/wrf/users/download/get_sources_new.php]
 RUN cd /home/myuser/WRF \
     && git clone --recurse-submodules https://github.com/wrf-model/WRF \
     && git clone https://github.com/wrf-model/WPS
+
+# Vtable by 'NIMR-TN-2014-016' p.30 of National meteorological research note in Korea # http://www.nims.go.kr/flexer/view.jsp?FileDir=/PU87/&SystemFileName=20141210163510_0.pdf&ftype=pdf&FileName=2014_%EC%9D%91%EC%9A%A9%EA%B3%BC_GIS%EB%A5%BC.pdf&org=KOR_OP_PU_MV_2&idx=405&c_idx=-999&seq=0
+RUN mv /home/myuser/bin/Vtable.LDPS /home/myuser/WRF/WPS/ungrib/Variable_Tables
 
 RUN cd /home/myuser/WRF/Downloads \
     && tar xvfz geog_high_res_mandatory.tar.gz \
@@ -81,22 +88,41 @@ RUN cd /home/myuser/WRF/Downloads \
     && tar xvfz zlib-1.3.tar.gz \
     && unzip    jasper-1.900.1.zip             
 
-    #&& wget https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_high_res_mandatory.tar.gz \
-    #&& tar xvfz geog_high_res_mandatory.tar.gz 
-    #&& wget https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz \
-    #&& tar xvfz geog_low_res_mandatory.tar.gz
-    #tar xvf kwgrib2.tar # grib2 convert .. from datacenter
+RUN mv /home/myuser/WRF/Downloads/WPS_GEOG /home/myuser/WRF
 
 # install WRF libraries
 RUN /home/myuser/bin/wrf_library_install.sh
+RUN if [ ! -f $HOME/.wrf_library_installed ]; then echo "Libraries used by WRF were not installed correctly." && exit 1; fi
 
-## WRF와 WPS의 소스 코드 다운로드 (4.2.2)
-#ENV WRF_VERSION 4.2.2
-#RUN wget https://github.com/wrf-model/WRF/archive/refs/tags/v$WRF_VERSION.tar.gz \
-#    && tar -xzf v$WRF_VERSION.tar.gz \
-#    && rm v$WRF_VERSION.tar.gz
+# install WRF libraries
+ENV HOME /home/myuser
+ENV DIR $HOME/WRF/Library
+ENV CC gcc
+ENV CXX g++
+ENV FC gfortran
+ENV F77 gfortran
+ENV HDF5 $DIR
+ENV PATH $DIR/bin:$PATH
+ENV NETCDF $DIR
+ENV LIBS "-lnetcdf -lhdf5_hl -lhdf5 -lz"
+ENV JASPERLIB $DIR/lib
+ENV JASPERINC $DIR/include
+ENV LD_LIBRARY_PATH $DIR/lib:$LD_LIBRARY_PATH
+ENV WRF_DIR $HOME/WRF/WRF
 
-# 기본 명령어 설정
+RUN /home/myuser/bin/wrf_install.sh
+RUN if [ ! -f $HOME/.wrf_installed ]; then echo "WRF is not installed correctly." && exit 1; fi
+
+RUN cd /home/myuser/WRF/Downloads \
+    && rm geog_high_res_mandatory.tar.gz \
+    && rm hdf5-1.10.5.tar.gz \
+    && rm libpng-1.6.37.tar.gz \
+    && rm mpich-3.3.1.tar.gz \
+    && rm netcdf-c-4.9.0.tar.gz \
+    && rm netcdf-fortran-4.6.0.tar.gz \
+    && rm zlib-1.3.tar.gz \
+    && rm jasper-1.900.1.zip             
+
 CMD ["bash"]
 
 ENTRYPOINT ["/home/myuser/bin/loop.sh"]

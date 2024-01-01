@@ -26,6 +26,8 @@ alias src_brc='source ~/.bashrc'
 # prompt 36m (skyblue)
 
 #alias 
+alias data='cd /home/myuser/WRF/DATA'
+alias geog='cd /home/myuser/WRF/WPS_GEOG'
 alias wps='cd /home/myuser/WRF/WPS'
 alias wrf='cd /home/myuser/WRF/WRF'
 alias real='cd /home/myuser/WRF/WRF/test/em_real'

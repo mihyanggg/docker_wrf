@@ -7,5 +7,6 @@ BASHRC_PATH="$HOME/.bashrc"
 sed -i '/#force_color_prompt/s/^#//' "$BASHRC_PATH"
 
 # permission
-sudo chown -R myuser:myuser bin/
+sudo find bin/ -exec chown myuser:myuser {} +
+#sudo chown -R myuser:myuser bin/*
 
