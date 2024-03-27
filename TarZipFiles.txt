@@ -1,0 +1,20 @@
+TarZipFiles/
+├── geog_high_res_mandatory.tar.gz
+├── geog_low_res_mandatory.tar.gz
+├── hdf5-1.10.5.tar.gz
+├── jasper-1.900.1.zip
+├── kwgrib2.tar
+├── landuse_30s_with_lakes.tar.bz2
+├── libpng-1.6.37.tar.gz
+├── matthew_1deg.tar.gz
+├── mpich-3.3.1.tar.gz
+├── ncview-2.1.9.tar.gz
+├── netcdf-c-4.9.0.tar.gz
+├── netcdf-fortran-4.6.0.tar.gz
+├── updated_Iceland_LU.tar.gz
+├── v4.1.2.tar.gz
+├── v4.1.tar.gz
+├── zlib-1.2.11.tar.gz
+└── zlib-1.3.tar.gz
+
+0 directories, 17 files
